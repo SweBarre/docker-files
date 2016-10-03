@@ -1,4 +1,4 @@
-docker run -e KEYSERVER=keyserver.ubuntu.com \
+docker run -e KEYSERVER=keys.gnupg.net \
            -e GPG_PASSPHRASE_FILE=/.passfile \
            -v ~/.passfile:/.passfile \
            -v $(pwd)/secret-subkeys:/secret-subkeys \
