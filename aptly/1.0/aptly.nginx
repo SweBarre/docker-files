@@ -1,0 +1,9 @@
+ server {
+    listen 8000;
+    root /home/aptly/.aptly/public;
+
+    location / {
+        autoindex on;
+    }
+
+}
