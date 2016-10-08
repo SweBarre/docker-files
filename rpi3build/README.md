@@ -22,9 +22,9 @@ docker run -e DEBMAIL="name@domain.tld" \
 
 #Environment variables
 ```
-DEBEMAIL	: your email address in changelog
+DEBEMAIL		: your email address in changelog
 DEBBFULLNAME	: your full name in changelog 
-FINAL_UID	: chown the final debs and/or config to UID
-JOBS		: specify -j to make (for examiple -j4)
+FINAL_UID		: chown the final debs and/or config to UID
+MAKE_PARAMS		: specify -j to make (for examiple -j4)
 CHANGE_MESSAGE	: message in debian/changelog (defaults to "My kernel build")
 ```

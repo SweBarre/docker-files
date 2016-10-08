@@ -32,7 +32,7 @@ if [ "$1" == "docker-entrypoint.sh" ] || [ -z ${1+x} ];then
   
       cd /root/src/linux
       git pull
-      make "$JOBS" zImage modules dtbs
+      make "$MAKE_PARAMS" zImage modules dtbs
       make ARCH=arm CROSS_COMPILE="$CROSS_COMPILE" INSTALL_MOD_PATH="$KERNEL_DESTINATION" modules_install
       scripts/mkknlimg arch/arm/boot/zImage "$KERNEL_DESTINATION/boot/$KERNEL.img"  
       cp arch/arm/boot/dts/*.dtb "$KERNEL_DESTINATION"
