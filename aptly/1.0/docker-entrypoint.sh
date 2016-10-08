@@ -2,19 +2,24 @@
 set -e
 
 if [ "$1" = 'nginx' ]; then
-    if [ ! -d "$DEBS_DIR" ];then
-        echo "Mount your Debian package directory to $DEBS_DIR."
+    if [ ! -d /debs ];then
+        echo "Mount your Debian package directory to /debs"
         exit 1
     fi
 
-    if [ ! -f "$GNUPG_SUBKEYFILE" ]
+    if [ ! -f /sign-key ]
     then
-        echo "Mount your gnupg secret signing subkey to $GNUPG_SUBKEYFILE."
+        echo "Mount your gnupg secret signing subkey to /sign-key"
         exit 1
     fi
-    gosu aptly gpg --import "$GNUPG_SUBKEYFILE"
-    chgrp aptly "$GPG_PASSPHRASE_FILE"
-    chmod g+r "$GPG_PASSPHRASE_FILE"
+    if [ ! -f /.passfile ]
+    then
+      echo "You must mount your password to your signing key in /.passfile"
+      exit 1
+    fi
+    gosu aptly gpg --import /sign-key
+    chgrp aptly /.passfile
+    chmod 0640 /.passfile
     # check if repo exists
     set +e
     gosu aptly aptly repo show "$APTLY_REPO_NAME"
@@ -28,7 +33,7 @@ if [ "$1" = 'nginx' ]; then
       gosu aptly aptly repo show --with-packages "$APTLY_REPO_NAME"
       gosu aptly aptly snapshot create "${APTLY_REPO_NAME}-0.1" from repo "$APTLY_REPO_NAME"
       set +e 
-      gosu aptly aptly publish snapshot -passphrase-file=$GPG_PASSPHRASE_FILE "${APTLY_REPO_NAME}-0.1" 
+      gosu aptly aptly publish snapshot -passphrase-file=/.passfile "${APTLY_REPO_NAME}-0.1" 
     fi
     set -e
     
