@@ -9,11 +9,16 @@ docker run \
   menuconfig
 
 ##Running the container
-docker run -e DEBMAIL=<email> \
+docker run -e DEBMAIL="name@domain.tld" \
+
   -e DEBFULLNAME="Your full name" \
+
   -v /path/to/debs/output:/debs
+
   -v /path/to/config:/root/src/linux/.config
+
   -d \
+
   bardak/rpibuild \
 
 
