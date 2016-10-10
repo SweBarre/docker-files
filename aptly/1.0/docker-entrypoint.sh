@@ -17,7 +17,9 @@ if [ "$1" = 'nginx' ]; then
       echo "You must mount your password to your signing key in /.passfile"
       exit 1
     fi
+    set +e
     gosu aptly gpg --import /sign-key
+    set -e
     chgrp aptly /.passfile
     chmod 0640 /.passfile
     # check if repo exists
@@ -31,11 +33,11 @@ if [ "$1" = 'nginx' ]; then
           "$APTLY_REPO_NAME"
       gosu aptly aptly repo add "$APTLY_REPO_NAME" "$DEBS_DIR"
       gosu aptly aptly repo show --with-packages "$APTLY_REPO_NAME"
-      gosu aptly aptly snapshot create "${APTLY_REPO_NAME}-0.1" from repo "$APTLY_REPO_NAME"
-      set +e 
-      gosu aptly aptly publish snapshot -passphrase-file=/.passfile "${APTLY_REPO_NAME}-0.1" 
+      gosu aptly aptly publish repo -batch -passphrase-file=/.passfile -architectures="$APTLY_ARCITECTURES" "${APTLY_REPO_NAME}" 
     fi
     set -e
+    
+    gosu aptly aptly api serve &
     
     exec "$@"
 fi
