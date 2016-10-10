@@ -1,6 +1,7 @@
 #My Aptly + Nginx image
 ```
 docker run -e APTLY_DISTRIBUTION=jessie \
+           -e APTLY_ARCHITECTURES="amd64,i386" \
            -v ~/.passfile:/.passfile \
            -v ~/.gnupg/aptly-sign-key:/sign-key \
            -v ~/my-debs:/debs \
@@ -13,7 +14,7 @@ docker run -e APTLY_DISTRIBUTION=jessie \
 APTLY_REPO_NAME		Name of aptly repo (defaults to repo)
 APTLY_DISTRIBUTION	Distribution of repo
 APTLY_COMPONENT		Component of repo (defaults to main)
-
+APTLY_ARCHITECTURES  	list of repo architectures
 ```
 
 #create a sub-key for signing packages

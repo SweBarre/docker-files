@@ -57,6 +57,6 @@ COPY aptly.nginx /etc/nginx/sites-enabled/aptly
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh / #backwards compat
 
-EXPOSE 80 443
+EXPOSE 80 443 8080
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

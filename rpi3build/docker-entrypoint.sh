@@ -22,6 +22,22 @@ if [ "$1" == "docker-entrypoint.sh" ] || [ -z ${1+x} ];then
     exit 1
   fi
 
+  if [ -z ${APTLY_SERVER_PORT+x} ];then
+    APTLY_SERVER_PORT=8080
+  fi
+
+  if [ -z ${APTLY_REPO+x} ];then
+    APTLY_REPO=repo
+  fi
+
+  if [ -z ${APTLY_COMPONENT+x} ];then
+    APTLY_COMPONENT=main
+  fi
+
+  if [ -z ${APTLY_DISTRIBUTION+x} ];then
+    APTLY_DISTRIBUTION=jessie
+  fi
+
   while true; do
     apt-get update
     KERNEL_VERSION="$(apt-cache show raspberrypi-kernel | sed -n 's/Version: \(.*\).*/\1/p')"
@@ -32,7 +48,7 @@ if [ "$1" == "docker-entrypoint.sh" ] || [ -z ${1+x} ];then
   
       cd /root/src/linux
       git pull
-      make "$MAKE_PARAMS" zImage modules dtbs
+      make zImage modules dtbs
       make ARCH=arm CROSS_COMPILE="$CROSS_COMPILE" INSTALL_MOD_PATH="$KERNEL_DESTINATION" modules_install
       scripts/mkknlimg arch/arm/boot/zImage "$KERNEL_DESTINATION/boot/$KERNEL.img"  
       cp arch/arm/boot/dts/*.dtb "$KERNEL_DESTINATION"
@@ -42,6 +58,20 @@ if [ "$1" == "docker-entrypoint.sh" ] || [ -z ${1+x} ];then
       cd "$KERNEL_DESTINATION"
       dch -i --distribution stable "$CHANGE_MESSAGE" 
       fakeroot debian/rules binary
+      # publish debs n aptly
+      if [ ! -z ${APTLY_SERVER+x} ];then
+        cd /root/src
+        FILES=*.deb
+        for f in $FILES
+        do
+          curl -X POST -F file="@$f" "http://$APTLY_SERVER:$APTLY_SERVER_PORT/api/files/${f%.deb}" 
+          curl -X POST "http://$APTLY_SERVER:$APTLY_SERVER_PORT/api/repos/$APTLY_REPO/file/${f%.deb}"
+        done
+        curl  -X PUT -H 'Content-Type: application/json' \
+            --data "{\"Signing\": {\"Batch\": true, \"PassphraseFile\": \"$APTLY_PASSFILE\", \"SecretKeyring\": \"$APTL_SIGN_KEY\"}}" \
+            "http://$APTLY_SERVER:$APTLY_SERVER_PORT/api/publish/:./$APTLY_DISTRIBUTION"
+      fi
+
       mv /root/src/*.deb /debs
       if [ ! -z ${FINAL_UID+x} ];then
         chown "$FINAL_UID":"$FINAL_UID" /debs/*.deb

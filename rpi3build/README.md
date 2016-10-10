@@ -19,12 +19,19 @@ docker run -e DEBMAIL="name@domain.tld" \
   bardak/rpibuild \
 ```
 
+look at docker-compose.yml for running together with my aptly image
+
 
 #Environment variables
 ```
 DEBEMAIL		: your email address in changelog
 DEBBFULLNAME	: your full name in changelog 
 FINAL_UID		: chown the final debs and/or config to UID
-MAKE_PARAMS		: specify -j to make (for examiple -j4)
 CHANGE_MESSAGE	: message in debian/changelog (defaults to "My kernel build")
+
+APTLY_SERVER : fqdn to aptly server
+APTLY_SERVER_PORT: port for aptly server (defaults to 8080)
+APTLY_REPO : name on repo that debs should be published in (default to repo)
+APTLY_DISTRIBUTION : Defaults to jessie
+
 ```

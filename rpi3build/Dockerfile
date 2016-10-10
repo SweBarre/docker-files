@@ -1,6 +1,7 @@
 FROM debian:jessie
 RUN apt-get update && apt-get install --no-install-recommends -y \
   git \
+  curl \
   build-essential \
   kernel-package \
   fakeroot \
@@ -15,20 +16,18 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   bc \
   vim \
   ca-certificates \
+  curl \
+  apt-transport-https \
   && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /root/src
 WORKDIR /root/src
 RUN git clone https://github.com/raspberrypi/tools
 RUN git clone --depth=1 https://github.com/raspberrypi/linux
-RUN apt-get update \
-    && apt-get install curl -y \
-    && curl http://archive.raspberrypi.org/debian/raspberrypi.gpg.key | apt-key add - \
-    && echo "deb-src http://archive.raspberrypi.org/debian/ jessie main ui" >> /etc/apt/sources.list.d/raspi.list \
-    && echo "deb [arch=armhf] http://archive.raspberrypi.org/debian/ jessie main ui" >> /etc/apt/sources.list.d/raspi.list \
+RUN curl https://archive.raspberrypi.org/debian/raspberrypi.gpg.key | apt-key add - \
+    && echo "deb-src https://archive.raspberrypi.org/debian/ jessie main ui" >> /etc/apt/sources.list.d/raspi.list \
+    && echo "deb [arch=armhf] https://archive.raspberrypi.org/debian/ jessie main ui" >> /etc/apt/sources.list.d/raspi.list \
     && dpkg --add-architecture armhf \
-#    && apt-get update \
-#    && apt-get source raspberrypi-firmware \
     && rm -rf /var/lib/apt/lists/*
 ENV PATH="/root/src/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin:${PATH}"
 ENV KERNEL=kernel7
