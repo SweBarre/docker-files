@@ -1,0 +1,30 @@
+version: '2'
+services:
+  rpi3_build:
+    image: rpi3build
+    volumes:
+      - ~/my-debs:/debs
+      - ~/rpi3_config:/root/src/linux/.config
+    environment:
+      - DEBEMAIL="jonas@forsberg.co"
+      - DEBFULLNAME="Jonas Forsberg"
+      - FINAL_UID=1000
+      - APTLY_SERVER=aptly
+      - APTL_SIGN_KEY=/sign-key
+      - APTLY_DISTRIBUTION=jessie
+      - APTLY_PASSFILE=/.passfile
+    depends_on:
+      - aptly
+    links:
+      - aptly
+  aptly:
+    image: aptly
+    ports:
+      - "80:8000"
+    environment:
+      - APTLY_DISTRIBUTION=jessie
+      - APTLY_ARCITECTURES=armhf,amd64
+    volumes:
+      - ~/my-debs:/debs
+      - ~/.gnupg/aptly-sign-key:/sign-key
+      - ~/.passfile:/.passfile
