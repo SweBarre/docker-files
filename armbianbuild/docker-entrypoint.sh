@@ -23,7 +23,7 @@ if [[ "$1" == "compile" ]] || [[ -z ${1+x} ]];then
     if [[ "$log" != "" ]];then
       git pull
       cd /root
-      cp lib compile.sh .
+      cp lib/compile.sh .
       exec ./compile.sh $COMPILE_OPTIONS
       if [ ! -z ${APTLY_SERVER+x} ];then
         cd /root/output/debs
