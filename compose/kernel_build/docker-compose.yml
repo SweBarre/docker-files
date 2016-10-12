@@ -17,6 +17,23 @@ services:
       - aptly
     links:
       - aptly
+
+  armbian:
+    image: armbian
+    volumes:
+      - ~/my-debs:/debs
+    environment:
+      - COMPILE_OPTIONS="BRANCH=next BOARD=bananapi KERNEL_ONLY=yes PROGRESS_DISPLAY=plain RELEASE=jessie KERNEL_KEEP_CONFIG=yes"
+      - FINAL_UID=1000
+      - APTLY_SERVER=aptly
+      - APTL_SIGN_KEY=/sign-key
+      - APTLY_DISTRIBUTION=jessie
+      - APTLY_PASSFILE=/.passfile
+    depends_on:
+      - aptly
+    links:
+      - aptly
+
   aptly:
     image: aptly
     ports:
