@@ -48,12 +48,12 @@ if [ "$1" == "docker-entrypoint.sh" ] || [ -z ${1+x} ];then
   
       cd /root/src/linux
       git pull
-      make zImage modules dtbs
+      make ARCH=arm CROSS_COMPILE="$CROSS_COMPILE" zImage modules dtbs
       make ARCH=arm CROSS_COMPILE="$CROSS_COMPILE" INSTALL_MOD_PATH="$KERNEL_DESTINATION" modules_install
       scripts/mkknlimg arch/arm/boot/zImage "$KERNEL_DESTINATION/boot/$KERNEL.img"  
       cp arch/arm/boot/dts/*.dtb "$KERNEL_DESTINATION"
       cp arch/arm/boot/dts/overlays/*.dtb* "$KERNEL_DESTINATION/boot/overlays/"
-      cp arch/arm/boot/dts/overlays/README "$KERNEL_DESTINATION/boot//overlays/"
+      cp arch/arm/boot/dts/overlays/README "$KERNEL_DESTINATION/boot/overlays/"
   
       cd "$KERNEL_DESTINATION"
       dch -i --distribution stable "$CHANGE_MESSAGE" 
@@ -81,6 +81,8 @@ if [ "$1" == "docker-entrypoint.sh" ] || [ -z ${1+x} ];then
     sleep 4h
   done
 
+
+
 elif [ "$1" == "menuconfig" ];then
   cd /root/src/linux
   if [ ! -d /config_output ];then
@@ -89,9 +91,8 @@ elif [ "$1" == "menuconfig" ];then
   fi
   if [ -f /config_output/config ];then
     cp /config_output/config /root/src/linux/.config
-  fi
-  if [ ! -f .config ]; then
-    make ARCH=arm CROSS_COMPILE="$CROSS_COMPILE" bcm2709_defconfig
+  else
+    cp /root/src/linux/arch/arm/configs/bcm2709_defconfig /root/src/linux/.config
   fi
   make ARCH=arm menuconfig
   cp .config /config_output/config
